@@ -9,11 +9,11 @@ Data::Hive - convenient access to hierarchical data
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 
@@ -24,6 +24,23 @@ our $VERSION = '0.01';
     $hive->foo->bar->quux->SET(17);
 
 =head1 METHODS
+
+Several methods are thin wrappers around required modules in
+Data::Hive::Store subclasses.  These methods all basically
+call a method on the store with the same (but lowercased)
+name and pass it the hive's path:
+
+=over
+
+=item * EXISTS
+
+=item * GET
+
+=item * SET
+
+=item * NAME
+
+=back
 
 =head2 NEW
 
@@ -95,6 +112,10 @@ sub GETNUM { shift->GET || 0 }
 
 =head2 SET
 
+  $hive->some->path->SET($val);
+
+Set this path's value in the store.
+
 =cut
 
 sub SET {
@@ -104,6 +125,9 @@ sub SET {
 
 =head2 NAME
 
+Returns a textual representation of this hive's path.
+Store-dependent.
+
 =cut
 
 sub NAME {
@@ -112,6 +136,11 @@ sub NAME {
 }
 
 =head2 ITEM
+
+  $hive->ITEM('foo');
+
+Return a child of this hive.  Useful for path segments whose
+names are not valid Perl method names.
 
 =cut
 
@@ -129,7 +158,25 @@ sub AUTOLOAD {
   (my $method = $AUTOLOAD) =~ s/.*:://;
   die "AUTOLOAD for '$method' called on non-object" unless ref $self;
   return if $method eq 'DESTROY';
+  if ($method =~ /^[A-Z]+$/) {
+    require Carp;
+    Carp::croak("all-caps method names are reserved: '$method'");
+  }
   return $self->ITEM($method);
+}
+
+=head2 EXISTS
+
+  if ($hive->foo->bar->EXISTS) { ... }
+
+Return true if the value represented by this hive exists in
+the store.
+
+=cut
+
+sub EXISTS {
+  my $self = shift;
+  return $self->{store}->exists($self->{path});
 }
 
 =head1 AUTHOR
