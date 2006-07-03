@@ -1,6 +1,7 @@
 abstract: convenient access to hierarchical data
 author: Hans Dieter Pearcey <hdp@cpan.org>
 build_requires: 
+  Test::MockObject: 0
   Test::More: 0
   Test::use::ok: 0
 distribution_type: module
@@ -13,4 +14,4 @@ no_index:
     - t
 requires: 
   Carp::Clan: 0
-version: 0.02
+version: 0.03
