@@ -1,12 +1,15 @@
-#line 1 "inc/Module/Install/Include.pm - /icg/lib/perl/5.6.1/Module/Install/Include.pm"
+#line 1
 package Module::Install::Include;
 
-use Module::Install::Base;
-@ISA = qw(Module::Install::Base);
-
-$VERSION = '0.57';
-
 use strict;
+use Module::Install::Base;
+
+use vars qw{$VERSION $ISCORE @ISA};
+BEGIN {
+	$VERSION = '0.64';
+	$ISCORE  = 1;
+	@ISA     = qw{Module::Install::Base};
+}
 
 sub include {
 	shift()->admin->include(@_);

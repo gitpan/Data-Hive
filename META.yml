@@ -5,7 +5,7 @@ build_requires:
   Test::More: 0
   Test::use::ok: 0
 distribution_type: module
-generated_by: Module::Install version 0.57
+generated_by: Module::Install version 0.64
 license: perl
 name: Data-Hive
 no_index: 
@@ -14,4 +14,4 @@ no_index:
     - t
 requires: 
   Carp::Clan: 0
-version: 0.03
+version: 0.040

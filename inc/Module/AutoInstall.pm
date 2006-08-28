@@ -1,12 +1,14 @@
-#line 1 "inc/Module/AutoInstall.pm - /icg/lib/perl/5.6.1/Module/AutoInstall.pm"
+#line 1
 package Module::AutoInstall;
-$Module::AutoInstall::VERSION = '1.01';
 
 use strict;
 use Cwd                 ();
 use ExtUtils::MakeMaker ();
 
-#line 218
+use vars qw{$VERSION};
+BEGIN {
+	$VERSION = '1.03';
+}
 
 # special map on pre-defined feature sets
 my %FeatureMap = (
@@ -19,7 +21,8 @@ my ( @Missing, @Existing,  %DisabledTests, $UnderCPAN,     $HasCPANPLUS );
 my ( $Config,  $CheckOnly, $SkipInstall,   $AcceptDefault, $TestOnly );
 my ( $PostambleActions, $PostambleUsed );
 
-_accept_default( !-t STDIN );      # see if it's a non-interactive session
+# See if it's a testing or non-interactive session
+_accept_default( $ENV{AUTOMATED_TESTING} or ! -t STDIN ); 
 _init();
 
 sub _accept_default {
@@ -92,7 +95,7 @@ sub import {
     my $core_all;
 
     print "*** $class version " . $class->VERSION . "\n";
-    print "*** Checking for dependencies...\n";
+    print "*** Checking for Perl dependencies...\n";
 
     my $cwd = Cwd::cwd();
 
@@ -211,7 +214,7 @@ sub import {
         }
     }
 
-    _check_lock();    # check for $UnderCPAN
+    $UnderCPAN = _check_lock();    # check for $UnderCPAN
 
     if ( @Missing and not( $CheckOnly or $UnderCPAN ) ) {
         require Config;
@@ -231,9 +234,20 @@ sub import {
     *{'main::WriteMakefile'} = \&Write if caller(0) eq 'main';
 }
 
-# CPAN.pm is non-reentrant, so check if we're under it and have no CPANPLUS
+# Check to see if we are currently running under CPAN.pm and/or CPANPLUS;
+# if we are, then we simply let it taking care of our dependencies
 sub _check_lock {
     return unless @Missing;
+
+    if ($ENV{PERL5_CPANPLUS_IS_RUNNING}) {
+        print <<'END_MESSAGE';
+
+*** Since we're running under CPANPLUS, I'll just let it take care
+    of the dependency's installation later.
+END_MESSAGE
+        return 1;
+    }
+
     _load_cpan();
 
     # Find the CPAN lock-file
@@ -253,10 +267,11 @@ sub _check_lock {
 *** Since we're running under CPAN, I'll just let it take care
     of the dependency's installation later.
 END_MESSAGE
-        $UnderCPAN = 1;
+        return 1;
     }
 
     close LOCK;
+    return;
 }
 
 sub install {
@@ -277,7 +292,8 @@ sub install {
         }
     }
 
-    return @installed unless @modules;    # nothing to do
+    return @installed unless @modules;  # nothing to do
+    return @installed if _check_lock(); # defer to the CPAN shell
 
     print "*** Installing dependencies...\n";
 
@@ -297,7 +313,7 @@ sub install {
         @modules = @newmod;
     }
 
-    if ( ! $UnderCPAN and _has_cpanplus() ) {
+    if ( _has_cpanplus() ) {
         _install_cpanplus( \@modules, \@config );
     } else {
         _install_cpan( \@modules, \@config );
@@ -463,9 +479,9 @@ sub _install_cpan {
                 delete $INC{$inc};
             }
 
-            $obj->force('install') if $args{force};
-
-            my $rv = $obj->install || eval {
+            my $rv = $args{force} ? CPAN::Shell->force( install => $pkg )
+                                  : CPAN::Shell->install($pkg);
+            $rv ||= eval {
                 $CPAN::META->instance( 'CPAN::Distribution', $obj->cpan_file, )
                   ->{install}
                   if $CPAN::META;
@@ -636,7 +652,9 @@ sub _version_check {
 
     # check for version numbers that are not in decimal format
     if ( ref($cur) or ref($min) or $cur =~ /v|\..*\./ or $min =~ /v|\..*\./ ) {
-        if ( $version::VERSION or defined( _load('version') ) ) {
+        if ( ( $version::VERSION or defined( _load('version') )) and
+             version->can('new') 
+            ) {
 
             # use version.pm if it is installed.
             return (
@@ -690,7 +708,7 @@ sub _make_args {
     $PostambleActions = (
         $missing
         ? "\$(PERL) $0 --config=$config --installdeps=$missing"
-        : "\@\$(NOOP)"
+        : "\$(NOECHO) \$(NOOP)"
     );
 
     return %args;
@@ -731,7 +749,7 @@ sub postamble {
     return << ".";
 
 config :: installdeps
-\t\@\$(NOOP)
+\t\$(NOECHO) \$(NOOP)
 
 checkdeps ::
 \t\$(PERL) $0 --checkdeps
@@ -747,4 +765,4 @@ installdeps ::
 
 __END__
 
-#line 979
+#line 1003

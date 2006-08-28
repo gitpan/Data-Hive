@@ -1,7 +1,7 @@
-#line 1 "inc/Module/Install/Base.pm - /icg/lib/perl/5.6.1/Module/Install/Base.pm"
+#line 1
 package Module::Install::Base;
 
-$VERSION = '0.57';
+$VERSION = '0.64';
 
 # Suspend handler for "redefined" warnings
 BEGIN {
