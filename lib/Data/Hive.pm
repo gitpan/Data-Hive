@@ -9,11 +9,11 @@ Data::Hive - convenient access to hierarchical data
 
 =head1 VERSION
 
-Version 0.040
+Version 0.050
 
 =cut
 
-our $VERSION = '0.040';
+our $VERSION = '0.050';
 
 =head1 SYNOPSIS
 
@@ -39,6 +39,8 @@ name and pass it the hive's path:
 =item * SET
 
 =item * NAME
+
+=item * DELETE
 
 =back
 
@@ -92,13 +94,15 @@ Retrieve the value represented by this object's path from the store.
 
 =head2 GETNUM
 
-Soley for Perl 5.6.1 compatability, where returning undef
-from overloaded numification causes a segfault.
+=head2 GETSTR
+
+Soley for Perl 5.6.1 compatability, where returning undef from overloaded
+numification/stringification can cause a segfault.
 
 =cut
 
 use overload (
-  q{""}    => 'GET',
+  q{""}    => 'GETSTR',
   q{0+}    => 'GETNUM',
   fallback => 1,
 );
@@ -109,6 +113,11 @@ sub GET {
 }
 
 sub GETNUM { shift->GET || 0 }
+
+sub GETSTR {
+  my $rv = shift->GET;
+  return defined($rv) ? $rv : '';
+}
 
 =head2 SET
 
@@ -177,6 +186,22 @@ the store.
 sub EXISTS {
   my $self = shift;
   return $self->{store}->exists($self->{path});
+}
+
+=head2 DELETE
+
+  $hive->foo->bar->DELETE;
+
+Delete the value represented by this hive from the store.  Returns the previous
+value, if any.
+
+Throw an exception if the given store can't delete items for some reason.
+
+=cut
+
+sub DELETE {
+  my $self = shift;
+  return $self->{store}->delete($self->{path});
 }
 
 =head1 AUTHOR
