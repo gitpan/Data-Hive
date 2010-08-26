@@ -1,105 +1,37 @@
-package Data::Hive;
-
-use warnings;
 use strict;
+use warnings;
+package Data::Hive;
+BEGIN {
+  $Data::Hive::VERSION = '0.054';
+}
+# ABSTRACT: convenient access to hierarchical data
 
-=head1 NAME
+use Carp ();
 
-Data::Hive - convenient access to hierarchical data
-
-=head1 VERSION
-
-Version 0.052
-
-=cut
-
-our $VERSION = '0.052';
-
-=head1 SYNOPSIS
-
-    use Data::Hive;
-
-    my $hive = Data::Hive->NEW(\%arg);
-    print $hive->foo->bar->baz;
-    $hive->foo->bar->quux->SET(17);
-
-=head1 METHODS
-
-Several methods are thin wrappers around required modules in
-Data::Hive::Store subclasses.  These methods all basically
-call a method on the store with the same (but lowercased)
-name and pass it the hive's path:
-
-=over
-
-=item * EXISTS
-
-=item * GET
-
-=item * SET
-
-=item * NAME
-
-=item * DELETE
-
-=back
-
-=head2 NEW
-
-arguments:
-
-=over
-
-=item * store
-
-A Data::Hive::Store object, or an object that implements its
-C<< get >>, C<< set >>, and C<< name >> methods.
-
-=item * store_class
-
-Class to instantiate C<< $store >> from.  The classname will
-have 'Data::Hive::Store::' prepended; to avoid this, prefix
-it with a '+' ('+My::Store').  Mutually exclusive with the C<<
-store >> option.
-
-=item * store_args
-
-Arguments to instantiate C<< $store >> with.  Mutually
-exclusive with the C<< store >> option.
-
-=back
-
-=cut
 
 sub NEW {
   my ($class, $arg) = @_;
   $arg ||= {};
-  $arg->{path} ||= [];
-  my $self = bless $arg => ref($class) || $class;
 
-  if ($self->{store_class} and $self->{store_args}) {
-    die "don't use 'store' with 'store_class' and 'store_args'" if $self->{store};
-    $self->{store_class} = "Data::Hive::Store::$self->{store_class}"
-      unless $self->{store_class} =~ s/^\+//;
-    $self->{store} = $self->{store_class}->new(@{ $self->{store_args} });
-    delete @{$self}{qw(store_class store_args)};
+  my @path = @{ $arg->{path} || [] };
+
+  my $self = bless { path => \@path } => ref($class) || $class;
+
+  if ($arg->{store_class} and $arg->{store_args}) {
+    die "don't use 'store' with 'store_class' and 'store_args'"
+      if $arg->{store};
+
+    $arg->{store_class} = "Data::Hive::Store::$arg->{store_class}"
+      unless $arg->{store_class} =~ s/^[+=]//;
+
+    $self->{store} = $arg->{store_class}->new(@{ $arg->{store_args} });
+  } else {
+    $self->{store} = $arg->{store};
   }
 
   return $self;
 }
 
-=head2 GET
-
-Retrieve the value represented by this object's path from the store.
-
-=head2 GETNUM
-
-=head2 GETSTR
-
-Soley for Perl 5.6.1 compatability, where returning undef from overloaded
-numification/stringification can cause a segfault.
-
-=cut
 
 use overload (
   q{""}    => 'GETSTR',
@@ -108,50 +40,30 @@ use overload (
 );
 
 sub GET {
-  my $self = shift;
-  return $self->{store}->get($self->{path});
+  my ($self, $default) = @_;
+  my $value = $self->{store}->get($self->{path});
+  return defined $value ? $value : $default;
 }
 
-sub GETNUM { shift->GET || 0 }
+sub GETNUM { shift->GET(@_) || 0 }
 
 sub GETSTR {
-  my $rv = shift->GET;
+  my $rv = shift->GET(@_);
   return defined($rv) ? $rv : '';
 }
 
-=head2 SET
-
-  $hive->some->path->SET($val);
-
-Set this path's value in the store.
-
-=cut
 
 sub SET {
   my $self = shift;
   return $self->{store}->set($self->{path}, @_);
 }
 
-=head2 NAME
-
-Returns a textual representation of this hive's path.
-Store-dependent.
-
-=cut
 
 sub NAME {
   my $self = shift;
   return $self->{store}->name($self->{path});
 }
 
-=head2 ITEM
-
-  $hive->ITEM('foo');
-
-Return a child of this hive.  Useful for path segments whose
-names are not valid Perl method names.
-
-=cut
 
 sub ITEM {
   my ($self, $key) = @_;
@@ -161,18 +73,170 @@ sub ITEM {
   });
 }
 
-our $AUTOLOAD;
 sub AUTOLOAD {
   my $self = shift;
+  our $AUTOLOAD;
+
   (my $method = $AUTOLOAD) =~ s/.*:://;
   die "AUTOLOAD for '$method' called on non-object" unless ref $self;
+
   return if $method eq 'DESTROY';
+
   if ($method =~ /^[A-Z]+$/) {
-    require Carp;
     Carp::croak("all-caps method names are reserved: '$method'");
   }
+
   return $self->ITEM($method);
 }
+
+
+sub EXISTS {
+  my $self = shift;
+  return $self->{store}->exists($self->{path});
+}
+
+
+sub DELETE {
+  my $self = shift;
+  return $self->{store}->delete($self->{path});
+}
+
+1;
+
+__END__
+=pod
+
+=head1 NAME
+
+Data::Hive - convenient access to hierarchical data
+
+=head1 VERSION
+
+version 0.054
+
+=head1 SYNOPSIS
+
+  use Data::Hive;
+
+  my $hive = Data::Hive->NEW(\%arg);
+  print $hive->foo->bar->baz;
+  $hive->foo->bar->quux->SET(17);
+
+=head1 METHODS
+
+Several methods are thin wrappers around required modules in
+Data::Hive::Store subclasses.  These methods all basically
+call a method on the store with the same (but lowercased)
+name and pass it the hive's path:
+
+=over 4
+
+=item *
+
+EXISTS
+
+=item *
+
+GET
+
+=item *
+
+SET
+
+=item *
+
+NAME
+
+=item *
+
+DELETE
+
+=back
+
+=head2 NEW
+
+arguments:
+
+=over 4
+
+=item store
+
+A Data::Hive::Store object, or an object that implements the required methods.
+Those are:
+
+=over 4
+
+=item *
+
+C<get>
+
+=item *
+
+C<set>
+
+=item *
+
+C<name>
+
+=item *
+
+C<exists>
+
+=item *
+
+C<delete>
+
+=back
+
+=item store_class
+
+Class to instantiate C<< $store >> from.  The classname will have
+C<Data::Hive::Store::> prepended; to avoid this, prefix it with a '='
+(C<=My::Store>).  Mutually exclusive with the C<< store >> option.
+
+A plus sign can be used instead of an equal sign, for historical reasons.
+
+=item store_args
+
+Arguments to instantiate C<< $store >> with.  Mutually exclusive with the C<<
+store >> option.
+
+=back
+
+=head2 GET
+
+Retrieve the value represented by this object's path from the store.  If an
+argument is passed, and the value of the entry is undef, the passed value is
+returned.
+
+  $hive->some->path->GET(10);
+
+The above will either returned the stored, defined value or 10.
+
+=head2 GETNUM
+
+=head2 GETSTR
+
+Soley for Perl 5.6.1 compatability, where returning undef from overloaded
+numification/stringification can cause a segfault.
+
+=head2 SET
+
+  $hive->some->path->SET($val);
+
+Set this path's value in the store.
+
+=head2 NAME
+
+Returns a textual representation of this hive's path.
+Store-dependent.
+
+=head2 ITEM
+
+  $hive->ITEM('foo');
+
+Return a child of this hive.  Useful for path segments whose names are not
+valid Perl method names.
 
 =head2 EXISTS
 
@@ -180,13 +244,6 @@ sub AUTOLOAD {
 
 Return true if the value represented by this hive exists in
 the store.
-
-=cut
-
-sub EXISTS {
-  my $self = shift;
-  return $self->{store}->exists($self->{path});
-}
 
 =head2 DELETE
 
@@ -197,62 +254,26 @@ value, if any.
 
 Throw an exception if the given store can't delete items for some reason.
 
-=cut
-
-sub DELETE {
-  my $self = shift;
-  return $self->{store}->delete($self->{path});
-}
-
-=head1 AUTHOR
-
-Hans Dieter Pearcey, C<< <hdp at cpan.org> >>
-
-=head1 BUGS
-
-Please report any bugs or feature requests to
-C<bug-data-hive at rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Data-Hive>.
-I will be notified, and then you'll automatically be notified of progress on
-your bug as I make changes.
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc Data::Hive
-
-You can also look for information at:
+=head1 AUTHORS
 
 =over 4
 
-=item * AnnoCPAN: Annotated CPAN documentation
+=item *
 
-L<http://annocpan.org/dist/Data-Hive>
+Hans Dieter Pearcey <hdp@cpan.org>
 
-=item * CPAN Ratings
+=item *
 
-L<http://cpanratings.perl.org/d/Data-Hive>
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-Hive>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Data-Hive>
+Ricardo Signes <rjbs@cpan.org>
 
 =back
 
-=head1 ACKNOWLEDGEMENTS
+=head1 COPYRIGHT AND LICENSE
 
-=head1 COPYRIGHT & LICENSE
+This software is copyright (c) 2006 by Hans Dieter Pearcey.
 
-Copyright 2006 Hans Dieter Pearcey, all rights reserved.
-
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
 
-1; # End of Data::Hive

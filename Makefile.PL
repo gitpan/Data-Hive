@@ -1,16 +1,57 @@
+
 use strict;
 use warnings;
-use inc::Module::Install;
 
-name 'Data-Hive';
-author 'Hans Dieter Pearcey <hdp@cpan.org>';
-all_from;
 
-build_requires 'Test::More'       => 0;
-build_requires 'Test::use::ok'    => 0;
-build_requires 'Test::MockObject' => 0;
 
-requires 'Carp::Clan' => 0;
+use ExtUtils::MakeMaker 6.31;
 
-auto_install;
-WriteAll;
+
+
+my %WriteMakefileArgs = (
+  'ABSTRACT' => 'convenient access to hierarchical data',
+  'AUTHOR' => 'Hans Dieter Pearcey <hdp@cpan.org>, Ricardo Signes <rjbs@cpan.org>',
+  'BUILD_REQUIRES' => {
+    'Test::MockObject' => '0',
+    'Test::More' => '0',
+    'ok' => '0'
+  },
+  'CONFIGURE_REQUIRES' => {
+    'ExtUtils::MakeMaker' => '6.31'
+  },
+  'DISTNAME' => 'Data-Hive',
+  'EXE_FILES' => [],
+  'LICENSE' => 'perl',
+  'NAME' => 'Data::Hive',
+  'PREREQ_PM' => {
+    'Carp' => '0',
+    'Carp::Clan' => '0',
+    'overload' => '0'
+  },
+  'VERSION' => '0.054',
+  'test' => {
+    'TESTS' => 't/*.t'
+  }
+);
+
+
+unless ( eval { ExtUtils::MakeMaker->VERSION(6.56) } ) {
+  my $br = delete $WriteMakefileArgs{BUILD_REQUIRES};
+  my $pp = $WriteMakefileArgs{PREREQ_PM};
+  for my $mod ( keys %$br ) {
+    if ( exists $pp->{$mod} ) {
+      $pp->{$mod} = $br->{$mod} if $br->{$mod} > $pp->{$mod};
+    }
+    else {
+      $pp->{$mod} = $br->{$mod};
+    }
+  }
+}
+
+delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
+  unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
+
+WriteMakefile(%WriteMakefileArgs);
+
+
+
