@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Data::Hive::Store;
 BEGIN {
-  $Data::Hive::Store::VERSION = '0.054';
+  $Data::Hive::Store::VERSION = '1.000';
 }
 # ABSTRACT: a backend storage driver for Data::Hive
 
@@ -27,7 +27,7 @@ Data::Hive::Store - a backend storage driver for Data::Hive
 
 =head1 VERSION
 
-version 0.054
+version 1.000
 
 =head1 DESCRIPTION
 
@@ -74,25 +74,9 @@ Delete the given path from the store.  Return the previous value, if any.
 
   my @keys = $store->keys(\@path, \%opt);
 
-This returns a list of next-level path elements that exist.  For example, given
-a hive with values for the following paths:
-
-  foo
-  foo/bar
-  foo/bar/baz
-  foo/xyz/abc
-  foo/xyz/def
-  foo/123
-
-This shows the expected results:
-
-  keys of      | returns
-  -------------+------------
-  foo          | bar, xyz, 123
-  foo/bar      | baz
-  foo/bar/baz  |
-  foo/xyz      | abc, def
-  foo/123      |
+This returns a list of next-level path elements that exist.  For more
+information on the expected behavior, see the L<KEYS method|Data:Hive/keys> in
+Data::Hive.
 
 =head1 AUTHORS
 

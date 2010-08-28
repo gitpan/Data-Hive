@@ -2,9 +2,11 @@ use strict;
 use warnings;
 package Data::Hive::Store::Param;
 BEGIN {
-  $Data::Hive::Store::Param::VERSION = '0.054';
+  $Data::Hive::Store::Param::VERSION = '1.000';
 }
 # ABSTRACT: CGI::param-like store for Data::Hive
+
+use URI::Escape ();
 
 
 sub _escape {
@@ -38,24 +40,20 @@ sub _param {
   return $self->{obj}->$meth($path, @_);
 }
 
-
 sub get {
   my ($self, $path) = @_;
   return $self->_param($path);
 }
 
-
 sub set {
   my ($self, $path, $val) = @_;
   return $self->_param($path => $val);
 }
-
  
 sub name {
   my ($self, $path) = @_;
   return $self->_path($path);
 }
-
 
 sub exists {
   my ($self, $path) = @_;
@@ -64,13 +62,31 @@ sub exists {
   return ref($code) ? $code->($key) : $self->{obj}->$code($key);
 }
 
-
 sub delete {
   my ($self, $path) = @_;
   my $code = $self->{delete};
   my $key = $self->_path($path);
-  return ref($code) ? $code->($key) : $self->{obj}->$code($key);
+
+  return $self->{obj}->$code($key);
 }
+
+sub keys {
+  my ($self, $path) = @_;
+
+  my $method = $self->{method};
+  my @names  = $self->{obj}->$method;
+
+  my $name = $self->_path($path);
+
+  my $sep = $self->{separator};
+
+  my $start = length $name ? "$name$sep" : q{};
+  my %seen  = map { /\A\Q$start\E(.+?)(\z|\Q$sep\E)/ ? ($1 => 1) : () } @names;
+
+  my @keys = map { URI::Escape::uri_unescape($_) } keys %seen;
+  return @keys;
+}
+
 
 1;
 
@@ -83,7 +99,14 @@ Data::Hive::Store::Param - CGI::param-like store for Data::Hive
 
 =head1 VERSION
 
-version 0.054
+version 1.000
+
+=head1 DESCRIPTION
+
+This hive store will soon be overhauled.
+
+Basically, it expects to access a hive in an object with CGI's C<param> method,
+or the numerous other things with that interface.
 
 =head1 METHODS
 
@@ -111,7 +134,7 @@ Use a different method name on the object (default is 'param').
 
 =item escape
 
-List of characters to escape (prepend '\' to) in keys.
+List of characters to escape (via URI encoding) in keys.
 
 Defaults to the C<< separator >>.
 
@@ -133,25 +156,12 @@ treat the object like a hashref and call C<delete> on it.
 
 =back
 
-=head2 get
+=head1 BUGS
 
-Join the path together with the C<< separator >> and get it from the object.
+The interaction between escapes and separators is not very well formalized or
+tested.  If you change things much, you'll probably be frustrated.
 
-=head2 set
-
-See L</get>.
-
-=head2 name
-
-Join path together with C<< separator >> and return it.
-
-=head2 exists
-
-Return true if the C<< name >> of this hive is a parameter.
-
-=head2 delete
-
-Delete the entry for the C<< name >> of this hive and return its old value.
+Fixes and/or tests would be lovely.
 
 =head1 AUTHORS
 

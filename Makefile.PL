@@ -12,8 +12,7 @@ my %WriteMakefileArgs = (
   'ABSTRACT' => 'convenient access to hierarchical data',
   'AUTHOR' => 'Hans Dieter Pearcey <hdp@cpan.org>, Ricardo Signes <rjbs@cpan.org>',
   'BUILD_REQUIRES' => {
-    'Test::MockObject' => '0',
-    'Test::More' => '0',
+    'Test::More' => '0.88',
     'ok' => '0'
   },
   'CONFIGURE_REQUIRES' => {
@@ -26,9 +25,10 @@ my %WriteMakefileArgs = (
   'PREREQ_PM' => {
     'Carp' => '0',
     'Carp::Clan' => '0',
+    'URI::Escape' => '0',
     'overload' => '0'
   },
-  'VERSION' => '0.054',
+  'VERSION' => '1.000',
   'test' => {
     'TESTS' => 't/*.t'
   }
