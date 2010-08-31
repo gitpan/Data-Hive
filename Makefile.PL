@@ -12,8 +12,7 @@ my %WriteMakefileArgs = (
   'ABSTRACT' => 'convenient access to hierarchical data',
   'AUTHOR' => 'Hans Dieter Pearcey <hdp@cpan.org>, Ricardo Signes <rjbs@cpan.org>',
   'BUILD_REQUIRES' => {
-    'Test::More' => '0.88',
-    'ok' => '0'
+    'Try::Tiny' => '0'
   },
   'CONFIGURE_REQUIRES' => {
     'ExtUtils::MakeMaker' => '6.31'
@@ -24,11 +23,10 @@ my %WriteMakefileArgs = (
   'NAME' => 'Data::Hive',
   'PREREQ_PM' => {
     'Carp' => '0',
-    'Carp::Clan' => '0',
-    'URI::Escape' => '0',
+    'Test::More' => '0.94',
     'overload' => '0'
   },
-  'VERSION' => '1.000',
+  'VERSION' => '1.001',
   'test' => {
     'TESTS' => 't/*.t'
   }

@@ -23,15 +23,13 @@
       "runtime" : {
          "requires" : {
             "Carp" : 0,
-            "Carp::Clan" : 0,
-            "URI::Escape" : 0,
+            "Test::More" : "0.94",
             "overload" : 0
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.88",
-            "ok" : 0
+            "Try::Tiny" : 0
          }
       }
    },
@@ -42,7 +40,7 @@
          "url" : "git://git.codesimply.com/Data-Hive.git"
       }
    },
-   "version" : "1.000",
+   "version" : "1.001",
    "x_Dist_Zilla" : {
       "plugins" : [
          {

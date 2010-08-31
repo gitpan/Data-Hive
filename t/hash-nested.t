@@ -3,37 +3,29 @@ use strict;
 use warnings;
 
 use Data::Hive;
-use Data::Hive::Store::Hash;
+use Data::Hive::Store::Hash::Nested;
 
 use Data::Hive::Test;
 
 use Test::More 0.88;
 
-use Try::Tiny;
-
-sub exception (&) {
-  my ($code) = @_;
-
-  return try { $code->(); return } catch { return $_ };
-}
-
 Data::Hive::Test->test_new_hive(
   'basic hash store',
-  { store => Data::Hive::Store::Hash->new },
+  { store => Data::Hive::Store::Hash::Nested->new },
 );
 
 for my $class (qw(
-  Hash
-  +Data::Hive::Store::Hash
-  =Data::Hive::Store::Hash
+  Hash::Nested
+  +Data::Hive::Store::Hash::Nested
+  =Data::Hive::Store::Hash::Nested
 )) {
   my $hive = Data::Hive->NEW({ store_class => $class });
 
-  isa_ok($hive->STORE, 'Data::Hive::Store::Hash', "store from $class");
+  isa_ok($hive->STORE, 'Data::Hive::Store::Hash::Nested', "store from $class");
 }
 
 my $hive = Data::Hive->NEW({
-  store_class => 'Hash',
+  store_class => 'Hash::Nested',
 });
 
 my $tmp;
@@ -46,7 +38,7 @@ $hive->foo->SET(1);
 
 is_deeply(
   $hive->STORE->hash_store,
-  { foo => 1 },
+  { foo => { '' => 1 } },
   'changes made to store',
 );
 
@@ -54,7 +46,7 @@ $hive->bar->baz->GET;
 
 is_deeply(
   $hive->STORE->hash_store,
-  { foo => 1 },
+  { foo => { '' => 1 } },
   'did not autovivify'
 );
 
@@ -63,8 +55,8 @@ $hive->baz->quux->SET(2);
 is_deeply(
   $hive->STORE->hash_store,
   {
-    foo => 1,
-    'baz.quux' => 2,
+    foo => { '' => 1 },
+    baz => { quux => { '' => 2 } },
   },
   'deep set',
 );
@@ -97,10 +89,8 @@ $hive->baz->quux->frotz->SET(4);
 is_deeply(
   $hive->STORE->hash_store,
   {
-    foo => 1,
-    'foo.bar' => 3,
-    'baz.quux' => 2,
-    'baz.quux.frotz' => 4,
+    foo => { '' => 1, bar => { '' => 3 } },
+    baz => { quux => { '' => 2, frotz => { '' => 4 } } },
   },
   "deep delete"
 );
@@ -113,9 +103,8 @@ is($quux->GET, undef, "after deletion, hive has no value");
 is_deeply(
   $hive->STORE->hash_store,
   {
-    foo => 1,
-    'foo.bar' => 3,
-    'baz.quux.frotz' => 4,
+    foo => { '' => 1, bar => { '' => 3 } },
+    baz => { quux => { frotz => { '' => 4 } } },
   },
   "deep delete"
 );
@@ -128,15 +117,14 @@ is($frotz->GET, undef, "after deletion, hive has no value");
 is_deeply(
   $hive->STORE->hash_store,
   {
-    foo => 1,
-    'foo.bar' => 3,
+    foo => { '' => 1, bar => { '' => 3 } },
   },
   "deep delete: after a hive had no keys, it is deleted, too"
 );
 
 {
   my $hive  = Data::Hive->NEW({
-    store_class => 'Hash',
+    store_class => 'Hash::Nested',
   });
 
   $hive->HIVE('and/or')->SET(1);
@@ -160,12 +148,6 @@ is_deeply(
     [ sort $hive->foo->bar->KEYS ],
     [ qw(baz) ],
     "get the KEYS under foo/bar",
-  );
-
-  like(
-    exception { $hive->HIVE('not.legal')->GET },
-    qr/illegal.+path part/,
-    "we can't use the delimiter in a path part with strict packer",
   );
 }
 

@@ -4,8 +4,7 @@ author:
   - 'Hans Dieter Pearcey <hdp@cpan.org>'
   - 'Ricardo Signes <rjbs@cpan.org>'
 build_requires:
-  Test::More: 0.88
-  ok: 0
+  Try::Tiny: 0
 configure_requires:
   ExtUtils::MakeMaker: 6.31
 dynamic_config: 0
@@ -17,12 +16,11 @@ meta-spec:
 name: Data-Hive
 requires:
   Carp: 0
-  Carp::Clan: 0
-  URI::Escape: 0
+  Test::More: 0.94
   overload: 0
 resources:
   repository: git://git.codesimply.com/Data-Hive.git
-version: 1.000
+version: 1.001
 x_Dist_Zilla:
   plugins:
     -

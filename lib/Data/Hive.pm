@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Data::Hive;
 BEGIN {
-  $Data::Hive::VERSION = '1.000';
+  $Data::Hive::VERSION = '1.001';
 }
 # ABSTRACT: convenient access to hierarchical data
 
@@ -10,12 +10,13 @@ use Carp ();
 
 
 sub NEW {
-  my ($class, $arg) = @_;
+  my ($invocant, $arg) = @_;
   $arg ||= {};
 
   my @path = @{ $arg->{path} || [] };
 
-  my $self = bless { path => \@path } => ref($class) || $class;
+  my $class = ref $invocant ? ref $invocant : $invocant;
+  my $self = bless { path => \@path } => $class;
 
   if ($arg->{store_class}) {
     die "don't use 'store' with 'store_class' and 'store_args'"
@@ -25,8 +26,10 @@ sub NEW {
       unless $arg->{store_class} =~ s/^[+=]//;
 
     $self->{store} = $arg->{store_class}->new(@{ $arg->{store_args} || [] });
-  } else {
+  } elsif ($arg->{store}) {
     $self->{store} = $arg->{store};
+  } else {
+    Carp::croak "can't create a hive with no store";
   }
 
   return $self;
@@ -34,8 +37,14 @@ sub NEW {
 
 
 use overload (
-  q{""}    => 'GETSTR',
-  q{0+}    => 'GETNUM',
+  q{""}    => sub {
+    Carp::carp "using hive as string for implicit GET is deprecated";
+    shift->GET(@_);
+  },
+  q{0+}    => sub {
+    Carp::carp "using hive as number for implicit GET is deprecated";
+    shift->GET(@_);
+  },
   fallback => 1,
 );
 
@@ -45,11 +54,14 @@ sub GET {
   return defined $value ? $value : $default;
 }
 
-sub GETNUM { shift->GET(@_) || 0 }
+sub GETNUM {
+  Carp::carp "GETNUM method is deprecated";
+  shift->GET(@_);
+}
 
 sub GETSTR {
-  my $rv = shift->GET(@_);
-  return defined($rv) ? $rv : '';
+  Carp::carp "GETSTR method is deprecated";
+  shift->GET(@_);
 }
 
 
@@ -68,6 +80,12 @@ sub EXISTS {
 sub DELETE {
   my $self = shift;
   return $self->STORE->delete($self->{path});
+}
+
+
+sub DELETE_ALL {
+  my $self = shift;
+  return $self->STORE->delete_all($self->{path});
 }
 
 
@@ -103,6 +121,30 @@ sub NAME {
 }
 
 
+sub ROOT {
+  my $self = shift;
+
+  return $self->NEW({
+    %$self,
+    path => [ ],
+  });
+}
+
+
+sub SAVE {
+  my ($self) = @_;
+
+  $self->STORE->save($self->{path});
+}
+
+
+sub SAVE_ALL {
+  my ($self) = @_;
+
+  $self->STORE->save_all($self->{path});
+}
+
+
 sub STORE {
   return $_[0]->{store}
 }
@@ -116,11 +158,11 @@ sub AUTOLOAD {
 
   return if $method eq 'DESTROY';
 
-  if ($method =~ /^[A-Z]+$/) {
+  if ($method =~ /^[A-Z_]+$/) {
     Carp::croak("all-caps method names are reserved: '$method'");
   }
 
-  return $self->ITEM($method);
+  return $self->HIVE($method);
 }
 
 1;
@@ -134,7 +176,7 @@ Data::Hive - convenient access to hierarchical data
 
 =head1 VERSION
 
-version 1.000
+version 1.001
 
 =head1 SYNOPSIS
 
@@ -160,7 +202,7 @@ differences:
 
 =item *
 
-a hive is always accessed by methods, never by dereferencing with C<<->{}>>
+a hive is always accessed by methods, never by dereferencing with C<< ->{} >>
 
 For example, these two lines perform similar tasks:
 
@@ -183,8 +225,8 @@ both.  For example, we can do this:
 This wouldn't be possible with a hashref, because C<< $href->{entry} >> could
 not hold both another node and a simple value.
 
-It also means that a hive might non-existant entries found along the ways to
-entries that exist:
+It also means that along the ways to existing values in a hive, there might be
+paths with no existing value.
 
   $hive->NEW(...);                  # create a new hive with no entries
 
@@ -243,37 +285,9 @@ you call an all-uppercase method.  These are detailed below.
 
 These methods are thin wrappers around required modules in L<Data::Hive::Store>
 subclasses.  These methods all basically call a method on the store with the
-same (but lowercased) name and pass it the hive's path:
+same (but lowercased) name and pass it the hive's path.
 
-=over 4
-
-=item *
-
-EXISTS
-
-=item *
-
-GET
-
-=item *
-
-SET
-
-=item *
-
-NAME
-
-=item *
-
-DELETE
-
-=item *
-
-KEYS
-
-=back
-
-=head2 NEW
+=head3 NEW
 
 This constructs a new hive object.  Note that the name is C<NEW> and not
 C<new>!  The C<new> method is just another method to pick a hive path part.
@@ -303,22 +317,24 @@ C<new> method.
 
 =back
 
-=head2 GET
+=head3 GET
 
   my $value = $hive->some->path->GET( $default );
 
 The C<GET> method gets the hive value.  If there is no defined value at the
 path and a default has been supplied, the default will be returned instead.
 
-=head2 GETNUM
+This method may also be called as C<GETSTR> or C<GETNUM> for backward
+compatibility, but this is deprecated and will be removed in a future release.
 
-=head2 GETSTR
+=head4 overloading
 
-These are provided soley for Perl 5.6.1 compatability, where returning undef
-from overloaded numification/stringification can cause a segfault.  They are
-used internally by the deprecated overloadings for hives.
+Hives are overloaded for stringification and numification so that they behave
+like their value when used without an explicit C<GET>.  This behavior is
+deprecated and will be removed in a future release.  Always use C<GET> to get
+the value of a hive.
 
-=head2 SET
+=head3 SET
 
   $hive->some->path->SET(10);
 
@@ -326,20 +342,25 @@ This method sets (replacing, if necessary) the hive value.
 
 Its return value is not defined.
 
-=head2 EXISTS
+=head3 EXISTS
 
   if ($hive->foo->bar->EXISTS) { ... }
 
 This method tests whether a value (even an undefined one) exists for the hive.
 
-=head2 DELETE
+=head3 DELETE
 
   $hive->foo->bar->DELETE;
 
 This method deletes the hive's value.  The deleted value is returned.  If no
 value had existed, C<undef> is returned.
 
-=head2 KEYS
+=head3 DELETE_ALL
+
+This method behaves like C<DELETE>, but all values for paths below the current
+one will also be deleted.
+
+=head3 KEYS
 
   my @keys = $hive->KEYS;
 
@@ -363,7 +384,7 @@ This shows the expected results:
   foo/xyz      | abc, def
   foo/123      |
 
-=head2 HIVE
+=head3 HIVE
 
   $hive->HIVE('foo');   #  equivalent to $hive->foo
 
@@ -380,13 +401,30 @@ Common offenders include C<moniker>, C<install_sub>, C<reinstall_sub>.
 This method should be needed fairly rarely.  It may also be called as C<ITEM>
 for historical reasons.
 
-=head2 NAME
+=head3 NAME
 
 This method returns a name that can be used to represent the hive's path.  This
 name is B<store-dependent>, and should not be relied upon if the store may
 change.  It is provided primarily for debugging.
 
-=head2 STORE
+=head3 ROOT
+
+This returns a Data::Hive object for the root of the hive.
+
+=head3 SAVE
+
+This method tells the hive store to save the value (or lack thereof) for the
+current path.  For many stores, this does nothing.  For hive stores that are
+written out only on demand, this method must be called.
+
+=head3 SAVE_ALL
+
+This method tells the hive store to save the value (or lack thereof) for the
+current path and all paths beneath it.  For many stores, this does nothing.
+For hive stores that are written out only on demand, this method must be
+called.
+
+=head3 STORE
 
 This method returns the storage driver being used by the hive.
 

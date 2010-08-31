@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Data::Hive::Store;
 BEGIN {
-  $Data::Hive::Store::VERSION = '1.000';
+  $Data::Hive::Store::VERSION = '1.001';
 }
 # ABSTRACT: a backend storage driver for Data::Hive
 
@@ -16,6 +16,30 @@ BEGIN {
   }
 }
 
+sub save {}
+
+sub save_all {
+  my ($self, $path) = @_;
+
+  $self->save;
+  for my $key ($self->keys($path)) {
+    $self->save_all([ @$path, $key ]);
+  }
+
+  return;
+}
+
+sub delete_all {
+  my ($self, $path) = @_;
+
+  $self->delete($path);
+  for my $key ($self->keys($path)) {
+    $self->delete_all([ @$path, $key ]);
+  }
+
+  return;
+}
+
 1;
 
 __END__
@@ -27,7 +51,7 @@ Data::Hive::Store - a backend storage driver for Data::Hive
 
 =head1 VERSION
 
-version 1.000
+version 1.001
 
 =head1 DESCRIPTION
 
@@ -74,9 +98,9 @@ Delete the given path from the store.  Return the previous value, if any.
 
   my @keys = $store->keys(\@path, \%opt);
 
-This returns a list of next-level path elements that exist.  For more
-information on the expected behavior, see the L<KEYS method|Data:Hive/keys> in
-Data::Hive.
+This returns a list of next-level path elements that lead toward existing
+values.  For more information on the expected behavior, see the L<KEYS
+method|Data:Hive/keys> in Data::Hive.
 
 =head1 AUTHORS
 

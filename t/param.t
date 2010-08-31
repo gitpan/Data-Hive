@@ -7,6 +7,9 @@ use Test::More;
 
 use Data::Hive;
 use Data::Hive::Store::Param;
+use Data::Hive::PathPacker::Flexible;
+
+use Data::Hive::Test;
 
 {
   package Infostore;
@@ -19,33 +22,34 @@ use Data::Hive::Store::Param;
     return $self->{$key};
   }
 
-  sub info_exists {
-    my ($self, $key) = @_;
-    return exists $self->{$key};
-  }
-
-  sub info_delete {
+  sub delete {
     my ($self, $key) = @_;
     return delete $self->{$key};
   }
 }
+
+Data::Hive::Test->test_new_hive(
+  "basic Param backed hive",
+  {
+    store_class => 'Param',
+    store_args  => [ Infostore->new, { method  => 'info' } ],
+  },
+);
 
 my $infostore = Infostore->new;
 
 my $hive = Data::Hive->NEW({
   store_class => 'Param',
   store_args  => [ $infostore, {
-    method    => 'info',
-    separator => '/',
-    exists => 'info_exists',
-    delete => 'info_delete',
+    method      => 'info',
+    path_packer => Data::Hive::PathPacker::Flexible->new({ separator => '/' }),
   } ],
 });
 
 $infostore->info(foo       => 1);
 $infostore->info('bar/baz' => 2);
 
-is $hive->bar->baz, 2, 'GET';
+is $hive->bar->baz->GET, 2, 'GET';
 $hive->foo->SET(3);
 is_deeply $infostore, { foo => 3, 'bar/baz' => 2 }, 'SET';
 
@@ -54,11 +58,12 @@ is $hive->bar->baz->NAME, 'bar/baz', 'NAME';
 ok ! $hive->not->EXISTS, "non-existent key doesn't EXISTS";
 ok   $hive->foo->EXISTS, "existing key does EXISTS";
 
-$hive->ITEM("and/or")->SET(17);
+$hive->HIVE("and/or")->SET(17);
 
 is_deeply $infostore, { foo => 3, 'bar/baz' => 2, 'and%2for' => 17 },
   'SET (with escape)';
-is $hive->ITEM("and/or"), 17, 'GET (with escape)';
+
+is $hive->HIVE("and/or")->GET, 17, 'GET (with escape)';
 
 is $hive->bar->baz->DELETE, 2, "delete returns old value";
 is_deeply $infostore, { foo => 3, 'and%2for' => 17 }, "delete removed item";
