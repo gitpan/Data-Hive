@@ -40,7 +40,7 @@
          "url" : "git://git.codesimply.com/Data-Hive.git"
       }
    },
-   "version" : "1.005",
+   "version" : "1.006",
    "x_Dist_Zilla" : {
       "plugins" : [
          {

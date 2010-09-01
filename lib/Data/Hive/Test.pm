@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Data::Hive::Test;
 BEGIN {
-  $Data::Hive::Test::VERSION = '1.005';
+  $Data::Hive::Test::VERSION = '1.006';
 }
 # ABSTRACT: a bundle of tests for Data::Hive stores
 
@@ -14,20 +14,35 @@ use Test::More 0.94; # subtest
 
 sub test_new_hive {
   my ($self, $desc, $arg) = @_;
-  
+
   if (@_ == 2) {
     $arg  = $desc;
     $desc = "hive tests from Data::Hive::Test";
   }
 
+  my $hive = Data::Hive->NEW($arg);
+
+  test_existing_hive($desc, $hive);
+}
+
+sub test_existing_hive {
+  my ($self, $desc, $hive) = @_;
+
+  if (@_ == 2) {
+    $hive = $desc;
+    $desc = "hive tests from Data::Hive::Test";
+  }
+
   $desc = "Data::Hive::Test: $desc";
 
-  my $hive;
-
   my $passed = subtest $desc => sub {
-    $hive = Data::Hive->NEW($arg);
-
     isa_ok($hive, 'Data::Hive');
+
+    is_deeply(
+      [ $hive->KEYS ],
+      [ ],
+      "we're starting with an empty hive",
+    );
 
     subtest 'value of one' => sub {
       ok(! $hive->one->EXISTS, "before being set, ->one doesn't EXISTS");
@@ -208,7 +223,7 @@ Data::Hive::Test - a bundle of tests for Data::Hive stores
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head1 SYNOPSIS
 
@@ -244,6 +259,13 @@ implementation.
 
 If the tests pass, the method will return the hive.  If they fail, the method
 will return false.
+
+=head2 test_existing_hive
+
+  Data::Hive::Test->test_existing_hive( $desc, $hive );
+
+This method behaves just like C<test_new_hive>, but expects a hive rather than
+arguments to use to build one.
 
 =head1 AUTHORS
 

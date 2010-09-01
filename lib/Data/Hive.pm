@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Data::Hive;
 BEGIN {
-  $Data::Hive::VERSION = '1.005';
+  $Data::Hive::VERSION = '1.006';
 }
 # ABSTRACT: convenient access to hierarchical data
 
@@ -187,7 +187,7 @@ Data::Hive - convenient access to hierarchical data
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head1 SYNOPSIS
 
