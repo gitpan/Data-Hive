@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Data::Hive::Store::Hash::Nested;
 BEGIN {
-  $Data::Hive::Store::Hash::Nested::VERSION = '1.003';
+  $Data::Hive::Store::Hash::Nested::VERSION = '1.004';
 }
 use base 'Data::Hive::Store';
 # ABSTRACT: store a hive in nested hashrefs
@@ -65,12 +65,9 @@ sub get {
       step => sub {
         my ($seg, $node) = @_;
 
-        if (defined $node and not ref $node) {
-          # We found a bogus entry in the store! -- rjbs, 2010-08-27
-          _die("can't get key '$seg' of non-ref value '$node'");
-        }
-
         die $BREAK unless exists $node->{$seg};
+
+        $node->{$seg} = { '' => $node->{$seg} } if ! ref $node->{$seg};
       }
     }
   );
@@ -175,7 +172,7 @@ Data::Hive::Store::Hash::Nested - store a hive in nested hashrefs
 
 =head1 VERSION
 
-version 1.003
+version 1.004
 
 =head1 DESCRIPTION
 
