@@ -5,7 +5,7 @@
       "Ricardo Signes <rjbs@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.102340, CPAN::Meta::Converter version 2.102160",
+   "generated_by" : "Dist::Zilla version 4.102340, CPAN::Meta::Converter version 2.102400",
    "license" : [
       "perl_5"
    ],
@@ -40,9 +40,14 @@
          "url" : "git://git.codesimply.com/Data-Hive.git"
       }
    },
-   "version" : "1.001",
+   "version" : "1.002",
    "x_Dist_Zilla" : {
       "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::BumpVersionFromGit",
+            "name" : "BumpVersionFromGit",
+            "version" : "0.007"
+         },
          {
             "class" : "Dist::Zilla::Plugin::GatherDir",
             "name" : "@Filter/@Basic/GatherDir",
@@ -156,27 +161,22 @@
          {
             "class" : "Dist::Zilla::Plugin::Git::Check",
             "name" : "@Filter/@Git/Check",
-            "version" : "1.102090"
+            "version" : "1.102380"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Commit",
             "name" : "@Filter/@Git/Commit",
-            "version" : "1.102090"
+            "version" : "1.102380"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Tag",
             "name" : "@Filter/@Git/Tag",
-            "version" : "1.102090"
+            "version" : "1.102380"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Push",
             "name" : "@Filter/@Git/Push",
-            "version" : "1.102090"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::BumpVersionFromGit",
-            "name" : "BumpVersionFromGit",
-            "version" : "0.007"
+            "version" : "1.102380"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
