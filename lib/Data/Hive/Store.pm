@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Data::Hive::Store;
 BEGIN {
-  $Data::Hive::Store::VERSION = '1.004';
+  $Data::Hive::Store::VERSION = '1.005';
 }
 # ABSTRACT: a backend storage driver for Data::Hive
 
@@ -51,7 +51,7 @@ Data::Hive::Store - a backend storage driver for Data::Hive
 
 =head1 VERSION
 
-version 1.004
+version 1.005
 
 =head1 DESCRIPTION
 

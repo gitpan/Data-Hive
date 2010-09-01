@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Data::Hive::PathPacker;
 BEGIN {
-  $Data::Hive::PathPacker::VERSION = '1.004';
+  $Data::Hive::PathPacker::VERSION = '1.005';
 }
 # ABSTRACT: a thing that converts paths to strings and then back
 
@@ -18,7 +18,7 @@ Data::Hive::PathPacker - a thing that converts paths to strings and then back
 
 =head1 VERSION
 
-version 1.004
+version 1.005
 
 =head1 DESCRIPTION
 

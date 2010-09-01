@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Data::Hive::Store::Hash::Nested;
 BEGIN {
-  $Data::Hive::Store::Hash::Nested::VERSION = '1.004';
+  $Data::Hive::Store::Hash::Nested::VERSION = '1.005';
 }
 use base 'Data::Hive::Store';
 # ABSTRACT: store a hive in nested hashrefs
@@ -105,6 +105,8 @@ sub exists {
       step => sub {
         my ($seg, $node) = @_;
         die $BREAK unless exists $node->{$seg};
+
+        $node->{$seg} = { '' => $node->{$seg} } if ! ref $node->{$seg};
       },
       end  => sub { return exists $_[0]->{''}; },
     },
@@ -121,11 +123,16 @@ sub delete {
       step => sub {
         my ($seg, $node) = @_;
         die $BREAK unless exists $node->{$seg};
+        $node->{$seg} = { '' => $node->{$seg} } if ! ref $node->{$seg};
         push @to_check, [ $node, $seg ];
       },
       cond => sub { @{ shift() } > 1 },
       end  => sub {
         my ($node, $final_path) = @_;
+
+        $node->{ $final_path->[0] } = { '' => $node->{ $final_path->[0] } }
+          unless ref $node->{ $final_path->[0] };
+
         my $this = $node->{ $final_path->[0] };
         my $rv = delete $this->{''};
 
@@ -154,6 +161,7 @@ sub keys {
     step => sub {
       my ($seg, $node) = @_;
       die $BREAK unless exists $node->{$seg};
+      $node->{$seg} = { '' => $node->{$seg} } if ! ref $node->{$seg};
     },
     end  => sub {
       return grep { length } keys %{ $_[0] };
@@ -172,7 +180,7 @@ Data::Hive::Store::Hash::Nested - store a hive in nested hashrefs
 
 =head1 VERSION
 
-version 1.004
+version 1.005
 
 =head1 DESCRIPTION
 

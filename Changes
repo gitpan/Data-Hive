@@ -1,5 +1,7 @@
 Revision history for Data-Hive
 
+1.005     2010-09-01 11:52:32 America/New_York
+
 1.004     2010-09-01 10:48:48 America/New_York
           automatically upgrade old-style nested hashes
 
