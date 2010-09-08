@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Data::Hive::PathPacker::Strict;
 BEGIN {
-  $Data::Hive::PathPacker::Strict::VERSION = '1.006';
+  $Data::Hive::PathPacker::Strict::VERSION = '1.007';
 }
 use base 'Data::Hive::PathPacker';
 # ABSTRACT: a simple, strict path packer
@@ -50,7 +50,7 @@ Data::Hive::PathPacker::Strict - a simple, strict path packer
 
 =head1 VERSION
 
-version 1.006
+version 1.007
 
 =head1 DESCRIPTION
 

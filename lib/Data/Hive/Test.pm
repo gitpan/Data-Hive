@@ -2,14 +2,14 @@ use strict;
 use warnings;
 package Data::Hive::Test;
 BEGIN {
-  $Data::Hive::Test::VERSION = '1.006';
+  $Data::Hive::Test::VERSION = '1.007';
 }
 # ABSTRACT: a bundle of tests for Data::Hive stores
 
 use Data::Hive;
 use Data::Hive::Store::Hash;
 
-use Test::More 0.94; # subtest
+use Test::More 0.96; # subtest without tests
 
 
 sub test_new_hive {
@@ -223,7 +223,7 @@ Data::Hive::Test - a bundle of tests for Data::Hive stores
 
 =head1 VERSION
 
-version 1.006
+version 1.007
 
 =head1 SYNOPSIS
 

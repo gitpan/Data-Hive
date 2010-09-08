@@ -23,10 +23,10 @@ my %WriteMakefileArgs = (
   'NAME' => 'Data::Hive',
   'PREREQ_PM' => {
     'Carp' => '0',
-    'Test::More' => '0.94',
+    'Test::More' => '0.96',
     'overload' => '0'
   },
-  'VERSION' => '1.006',
+  'VERSION' => '1.007',
   'test' => {
     'TESTS' => 't/*.t'
   }
