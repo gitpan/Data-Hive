@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Data::Hive;
 BEGIN {
-  $Data::Hive::VERSION = '1.007';
+  $Data::Hive::VERSION = '1.008';
 }
 # ABSTRACT: convenient access to hierarchical data
 
@@ -173,6 +173,8 @@ sub AUTOLOAD {
     Carp::croak("all-caps method names are reserved: '$method'");
   }
 
+  Carp::cluck("arguments passed to autoloaded Data::Hive descender") if @_;
+
   return $self->HIVE($method);
 }
 
@@ -187,7 +189,7 @@ Data::Hive - convenient access to hierarchical data
 
 =head1 VERSION
 
-version 1.007
+version 1.008
 
 =head1 SYNOPSIS
 
