@@ -4,31 +4,37 @@ use warnings;
 
 
 
-use ExtUtils::MakeMaker 6.31;
+use ExtUtils::MakeMaker 6.30;
 
 
 
 my %WriteMakefileArgs = (
-  'ABSTRACT' => 'convenient access to hierarchical data',
-  'AUTHOR' => 'Hans Dieter Pearcey <hdp@cpan.org>, Ricardo Signes <rjbs@cpan.org>',
-  'BUILD_REQUIRES' => {
-    'Try::Tiny' => '0'
+  "ABSTRACT" => "convenient access to hierarchical data",
+  "AUTHOR" => "Hans Dieter Pearcey <hdp\@cpan.org>, Ricardo Signes <rjbs\@cpan.org>",
+  "BUILD_REQUIRES" => {
+    "File::Find" => 0,
+    "File::Temp" => 0,
+    "Test::More" => "0.96",
+    "Try::Tiny" => 0
   },
-  'CONFIGURE_REQUIRES' => {
-    'ExtUtils::MakeMaker' => '6.31'
+  "CONFIGURE_REQUIRES" => {
+    "ExtUtils::MakeMaker" => "6.30"
   },
-  'DISTNAME' => 'Data-Hive',
-  'EXE_FILES' => [],
-  'LICENSE' => 'perl',
-  'NAME' => 'Data::Hive',
-  'PREREQ_PM' => {
-    'Carp' => '0',
-    'Test::More' => '0.96',
-    'overload' => '0'
+  "DISTNAME" => "Data-Hive",
+  "EXE_FILES" => [],
+  "LICENSE" => "perl",
+  "NAME" => "Data::Hive",
+  "PREREQ_PM" => {
+    "Carp" => 0,
+    "Test::More" => "0.96",
+    "base" => 0,
+    "overload" => 0,
+    "strict" => 0,
+    "warnings" => 0
   },
-  'VERSION' => '1.008',
-  'test' => {
-    'TESTS' => 't/*.t'
+  "VERSION" => "1.009",
+  "test" => {
+    "TESTS" => "t/*.t"
   }
 );
 

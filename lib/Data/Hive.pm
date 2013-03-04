@@ -1,8 +1,8 @@
 use strict;
 use warnings;
 package Data::Hive;
-BEGIN {
-  $Data::Hive::VERSION = '1.008';
+{
+  $Data::Hive::VERSION = '1.009';
 }
 # ABSTRACT: convenient access to hierarchical data
 
@@ -51,17 +51,10 @@ use overload (
 sub GET {
   my ($self, $default) = @_;
   my $value = $self->STORE->get($self->{path});
-  return defined $value ? $value : $default;
-}
-
-sub GETNUM {
-  Carp::carp "GETNUM method is deprecated";
-  shift->GET(@_);
-}
-
-sub GETSTR {
-  Carp::carp "GETSTR method is deprecated";
-  shift->GET(@_);
+  return defined $value     ? $value
+       : ! defined $default ? undef
+       : ref $default       ? $default->()
+       :                      $default;
 }
 
 
@@ -181,6 +174,7 @@ sub AUTOLOAD {
 1;
 
 __END__
+
 =pod
 
 =head1 NAME
@@ -189,7 +183,7 @@ Data::Hive - convenient access to hierarchical data
 
 =head1 VERSION
 
-version 1.008
+version 1.009
 
 =head1 SYNOPSIS
 
@@ -199,7 +193,7 @@ version 1.008
 
   $hive->foo->bar->quux->SET(17);
 
-  print $hive->foo->bar->baz->quux->GET;  # 17
+  print $hive->foo->bar->quux->GET;  # 17
 
 =head1 DESCRIPTION
 
@@ -337,8 +331,9 @@ C<new> method.
 The C<GET> method gets the hive value.  If there is no defined value at the
 path and a default has been supplied, the default will be returned instead.
 
-This method may also be called as C<GETSTR> or C<GETNUM> for backward
-compatibility, but this is deprecated and will be removed in a future release.
+C<$default> should be a simple scalar or a subroutine.  If C<$default> is a
+subroutine, it will be called to compute the default only if needed.  The
+behavior for other types of defaults is undefined.
 
 =head4 overloading
 
@@ -353,7 +348,11 @@ the value of a hive.
 
 This method sets (replacing, if necessary) the hive value.
 
-Its return value is not defined.
+Data::Hive was built to store simple scalars as values.  Although it
+I<probably> works just fine with references in the hive, it has not been
+tested for such use, and there may be bugs lurking in there.
+
+C<SET>'s return value is not defined.
 
 =head3 EXISTS
 
@@ -476,4 +475,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

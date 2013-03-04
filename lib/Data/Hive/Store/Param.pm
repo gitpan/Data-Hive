@@ -1,8 +1,8 @@
 use strict;
 use warnings;
 package Data::Hive::Store::Param;
-BEGIN {
-  $Data::Hive::Store::Param::VERSION = '1.008';
+{
+  $Data::Hive::Store::Param::VERSION = '1.009';
 }
 use base 'Data::Hive::Store';
 # ABSTRACT: CGI::param-like store for Data::Hive
@@ -103,6 +103,7 @@ sub keys {
 1;
 
 __END__
+
 =pod
 
 =head1 NAME
@@ -111,7 +112,7 @@ Data::Hive::Store::Param - CGI::param-like store for Data::Hive
 
 =head1 VERSION
 
-version 1.008
+version 1.009
 
 =head1 DESCRIPTION
 
@@ -213,4 +214,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

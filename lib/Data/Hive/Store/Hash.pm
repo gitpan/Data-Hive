@@ -1,8 +1,8 @@
 use strict;
 use warnings;
 package Data::Hive::Store::Hash;
-BEGIN {
-  $Data::Hive::Store::Hash::VERSION = '1.008';
+{
+  $Data::Hive::Store::Hash::VERSION = '1.009';
 }
 use base 'Data::Hive::Store';
 # ABSTRACT: store a hive in a flat hashref
@@ -80,6 +80,7 @@ sub keys {
 1;
 
 __END__
+
 =pod
 
 =head1 NAME
@@ -88,7 +89,7 @@ Data::Hive::Store::Hash - store a hive in a flat hashref
 
 =head1 VERSION
 
-version 1.008
+version 1.009
 
 =head1 DESCRIPTION
 
@@ -164,4 +165,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

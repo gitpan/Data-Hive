@@ -1,8 +1,8 @@
 use strict;
 use warnings;
 package Data::Hive::PathPacker;
-BEGIN {
-  $Data::Hive::PathPacker::VERSION = '1.008';
+{
+  $Data::Hive::PathPacker::VERSION = '1.009';
 }
 # ABSTRACT: a thing that converts paths to strings and then back
 
@@ -10,6 +10,7 @@ BEGIN {
 1;
 
 __END__
+
 =pod
 
 =head1 NAME
@@ -18,7 +19,7 @@ Data::Hive::PathPacker - a thing that converts paths to strings and then back
 
 =head1 VERSION
 
-version 1.008
+version 1.009
 
 =head1 DESCRIPTION
 
@@ -64,4 +65,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

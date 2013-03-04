@@ -1,8 +1,8 @@
 use strict;
 use warnings;
 package Data::Hive::Store;
-BEGIN {
-  $Data::Hive::Store::VERSION = '1.008';
+{
+  $Data::Hive::Store::VERSION = '1.009';
 }
 # ABSTRACT: a backend storage driver for Data::Hive
 
@@ -43,6 +43,7 @@ sub delete_all {
 1;
 
 __END__
+
 =pod
 
 =head1 NAME
@@ -51,7 +52,7 @@ Data::Hive::Store - a backend storage driver for Data::Hive
 
 =head1 VERSION
 
-version 1.008
+version 1.009
 
 =head1 DESCRIPTION
 
@@ -124,4 +125,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

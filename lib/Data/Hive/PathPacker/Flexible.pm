@@ -1,8 +1,8 @@
 use strict;
 use warnings;
 package Data::Hive::PathPacker::Flexible;
-BEGIN {
-  $Data::Hive::PathPacker::Flexible::VERSION = '1.008';
+{
+  $Data::Hive::PathPacker::Flexible::VERSION = '1.009';
 }
 use base 'Data::Hive::PathPacker';
 # ABSTRACT: a path packer that can be customized with callbacks
@@ -55,6 +55,7 @@ sub unpack_path {
 1;
 
 __END__
+
 =pod
 
 =head1 NAME
@@ -63,7 +64,7 @@ Data::Hive::PathPacker::Flexible - a path packer that can be customized with cal
 
 =head1 VERSION
 
-version 1.008
+version 1.009
 
 =head1 DESCRIPTION
 
@@ -125,4 +126,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

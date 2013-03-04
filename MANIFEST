@@ -15,8 +15,11 @@ lib/Data/Hive/Store/Hash.pm
 lib/Data/Hive/Store/Hash/Nested.pm
 lib/Data/Hive/Store/Param.pm
 lib/Data/Hive/Test.pm
+t/00-compile.t
+t/000-report-versions-tiny.t
 t/errors.t
 t/hash-nested.t
 t/hash.t
 t/param.t
-t/release-pod-syntax.t
+xt/release/changes_has_content.t
+xt/release/pod-syntax.t

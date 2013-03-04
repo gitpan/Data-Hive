@@ -1,8 +1,8 @@
 use strict;
 use warnings;
 package Data::Hive::PathPacker::Strict;
-BEGIN {
-  $Data::Hive::PathPacker::Strict::VERSION = '1.008';
+{
+  $Data::Hive::PathPacker::Strict::VERSION = '1.009';
 }
 use base 'Data::Hive::PathPacker';
 # ABSTRACT: a simple, strict path packer
@@ -42,6 +42,7 @@ sub unpack_path {
 1;
 
 __END__
+
 =pod
 
 =head1 NAME
@@ -50,7 +51,7 @@ Data::Hive::PathPacker::Strict - a simple, strict path packer
 
 =head1 VERSION
 
-version 1.008
+version 1.009
 
 =head1 DESCRIPTION
 
@@ -90,4 +91,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
