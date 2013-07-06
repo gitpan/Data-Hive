@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Data::Hive::Store::Hash;
 {
-  $Data::Hive::Store::Hash::VERSION = '1.009';
+  $Data::Hive::Store::Hash::VERSION = '1.010';
 }
 use base 'Data::Hive::Store';
 # ABSTRACT: store a hive in a flat hashref
@@ -89,7 +89,7 @@ Data::Hive::Store::Hash - store a hive in a flat hashref
 
 =head1 VERSION
 
-version 1.009
+version 1.010
 
 =head1 DESCRIPTION
 

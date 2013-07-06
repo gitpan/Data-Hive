@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Data::Hive::PathPacker::Flexible;
 {
-  $Data::Hive::PathPacker::Flexible::VERSION = '1.009';
+  $Data::Hive::PathPacker::Flexible::VERSION = '1.010';
 }
 use base 'Data::Hive::PathPacker';
 # ABSTRACT: a path packer that can be customized with callbacks
@@ -64,7 +64,7 @@ Data::Hive::PathPacker::Flexible - a path packer that can be customized with cal
 
 =head1 VERSION
 
-version 1.009
+version 1.010
 
 =head1 DESCRIPTION
 

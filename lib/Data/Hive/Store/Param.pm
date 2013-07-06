@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Data::Hive::Store::Param;
 {
-  $Data::Hive::Store::Param::VERSION = '1.009';
+  $Data::Hive::Store::Param::VERSION = '1.010';
 }
 use base 'Data::Hive::Store';
 # ABSTRACT: CGI::param-like store for Data::Hive
@@ -112,7 +112,7 @@ Data::Hive::Store::Param - CGI::param-like store for Data::Hive
 
 =head1 VERSION
 
-version 1.009
+version 1.010
 
 =head1 DESCRIPTION
 
