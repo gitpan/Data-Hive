@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Data::Hive::Test;
 {
-  $Data::Hive::Test::VERSION = '1.010';
+  $Data::Hive::Test::VERSION = '1.011';
 }
 # ABSTRACT: a bundle of tests for Data::Hive stores
 
@@ -222,13 +222,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Data::Hive::Test - a bundle of tests for Data::Hive stores
 
 =head1 VERSION
 
-version 1.010
+version 1.011
 
 =head1 SYNOPSIS
 

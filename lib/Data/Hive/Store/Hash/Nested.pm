@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Data::Hive::Store::Hash::Nested;
 {
-  $Data::Hive::Store::Hash::Nested::VERSION = '1.010';
+  $Data::Hive::Store::Hash::Nested::VERSION = '1.011';
 }
 use base 'Data::Hive::Store';
 # ABSTRACT: store a hive in nested hashrefs
@@ -175,13 +175,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Data::Hive::Store::Hash::Nested - store a hive in nested hashrefs
 
 =head1 VERSION
 
-version 1.010
+version 1.011
 
 =head1 DESCRIPTION
 

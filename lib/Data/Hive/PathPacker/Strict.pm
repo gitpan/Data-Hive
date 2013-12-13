@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Data::Hive::PathPacker::Strict;
 {
-  $Data::Hive::PathPacker::Strict::VERSION = '1.010';
+  $Data::Hive::PathPacker::Strict::VERSION = '1.011';
 }
 use base 'Data::Hive::PathPacker';
 # ABSTRACT: a simple, strict path packer
@@ -45,13 +45,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Data::Hive::PathPacker::Strict - a simple, strict path packer
 
 =head1 VERSION
 
-version 1.010
+version 1.011
 
 =head1 DESCRIPTION
 

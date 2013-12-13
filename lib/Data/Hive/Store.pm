@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Data::Hive::Store;
 {
-  $Data::Hive::Store::VERSION = '1.010';
+  $Data::Hive::Store::VERSION = '1.011';
 }
 # ABSTRACT: a backend storage driver for Data::Hive
 
@@ -46,13 +46,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Data::Hive::Store - a backend storage driver for Data::Hive
 
 =head1 VERSION
 
-version 1.010
+version 1.011
 
 =head1 DESCRIPTION
 
