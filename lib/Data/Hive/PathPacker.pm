@@ -1,11 +1,29 @@
 use strict;
 use warnings;
 package Data::Hive::PathPacker;
-{
-  $Data::Hive::PathPacker::VERSION = '1.011';
-}
 # ABSTRACT: a thing that converts paths to strings and then back
-
+$Data::Hive::PathPacker::VERSION = '1.012';
+#pod =head1 DESCRIPTION
+#pod
+#pod Data::Hive::PathPacker classes are used by some L<Data::Hive::Store> classes to convert hive paths to strings so that deep hives can be stored in flat storage.
+#pod
+#pod Path packers must implement two methods:
+#pod
+#pod =method pack_path
+#pod
+#pod   my $str = $packer->pack_path( \@path );
+#pod
+#pod This method is passed an arrayref of path parts and returns a string to be used
+#pod as a key in flat storage for the path.
+#pod
+#pod =method unpack_path
+#pod
+#pod   my $path_arrayref = $packer->unpack_path( $str );
+#pod
+#pod This method is passed a string and returns an arrayref of path parts
+#pod represented by the string.
+#pod
+#pod =cut
 
 1;
 
@@ -21,7 +39,7 @@ Data::Hive::PathPacker - a thing that converts paths to strings and then back
 
 =head1 VERSION
 
-version 1.011
+version 1.012
 
 =head1 DESCRIPTION
 

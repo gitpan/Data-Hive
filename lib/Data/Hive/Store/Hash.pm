@@ -1,12 +1,52 @@
 use strict;
 use warnings;
 package Data::Hive::Store::Hash;
-{
-  $Data::Hive::Store::Hash::VERSION = '1.011';
-}
-use base 'Data::Hive::Store';
 # ABSTRACT: store a hive in a flat hashref
+$Data::Hive::Store::Hash::VERSION = '1.012';
+use parent 'Data::Hive::Store';
 
+#pod =head1 DESCRIPTION
+#pod
+#pod This is a simple store, primarily for testing, that will store hives in a flat
+#pod hashref.  Paths are packed into strings and used as keys.  The structure does
+#pod not recurse -- for that, see L<Data::Hive::Store::Hash::Nested>.
+#pod
+#pod So, we could do this:
+#pod
+#pod   my $href = {};
+#pod
+#pod   my $hive = Data::Hive->NEW({
+#pod     store_class => 'Hash',
+#pod     store_args  => [ $href ],
+#pod   });
+#pod
+#pod   $hive->foo->SET(1);
+#pod   $hive->foo->bar->baz->SET(2);
+#pod
+#pod We would end up with C<$href> containing something like:
+#pod
+#pod   {
+#pod     foo => 1,
+#pod     'foo.bar.baz' => 2
+#pod   }
+#pod
+#pod =method new
+#pod
+#pod   my $store = Data::Hive::Store::Hash->new(\%hash, \%arg);
+#pod
+#pod The only argument expected for C<new> is a hashref, which is the hashref in
+#pod which hive entries are stored.
+#pod
+#pod If no hashref is provided, a new, empty hashref will be used.
+#pod
+#pod The extra arguments may include:
+#pod
+#pod =for :list
+#pod = path_packer
+#pod A L<Data::Hive::PathPacker>-like object used to convert between paths
+#pod (arrayrefs) and hash keys.
+#pod
+#pod =cut
 
 sub new {
   my ($class, $href, $arg) = @_;
@@ -24,6 +64,12 @@ sub new {
   return bless $guts => $class;
 }
 
+#pod =method hash_store
+#pod
+#pod This method returns the hashref in which things are being used.  You should not
+#pod alter its contents!
+#pod
+#pod =cut
 
 sub hash_store  { $_[0]->{store} }
 sub path_packer { $_[0]->{path_packer} }
@@ -57,7 +103,6 @@ sub delete {
 sub keys {
   my ($self, $path) = @_;
 
-  my $method = $self->{method};
   my @names  = keys %{ $self->hash_store };
 
   my %is_key;
@@ -91,7 +136,7 @@ Data::Hive::Store::Hash - store a hive in a flat hashref
 
 =head1 VERSION
 
-version 1.011
+version 1.012
 
 =head1 DESCRIPTION
 

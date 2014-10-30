@@ -1,12 +1,76 @@
 use strict;
 use warnings;
 package Data::Hive::Store::Param;
-{
-  $Data::Hive::Store::Param::VERSION = '1.011';
-}
-use base 'Data::Hive::Store';
 # ABSTRACT: CGI::param-like store for Data::Hive
+$Data::Hive::Store::Param::VERSION = '1.012';
+use parent 'Data::Hive::Store';
 
+#pod =head1 DESCRIPTION
+#pod
+#pod This hive store will soon be overhauled.
+#pod
+#pod Basically, it expects to access a hive in an object with CGI's C<param> method,
+#pod or the numerous other things with that interface.
+#pod
+#pod =method new
+#pod
+#pod   # use default method name 'param'
+#pod   my $store = Data::Hive::Store::Param->new($obj);
+#pod
+#pod   # use different method name 'info'
+#pod   my $store = Data::Hive::Store::Param->new($obj, { method => 'info' });
+#pod
+#pod   # escape certain characters in keys
+#pod   my $store = Data::Hive::Store::Param->new($obj, { escape => './!' });
+#pod
+#pod Return a new Param store.
+#pod
+#pod Several interesting arguments can be passed in a hashref after the first
+#pod (mandatory) object argument.
+#pod
+#pod =begin :list 
+#pod
+#pod = method
+#pod
+#pod Use a different method name on the object (default is 'param').
+#pod
+#pod This method should have the "usual" behavior for a C<param> method:
+#pod
+#pod =for :list
+#pod * calling C<< $obj->param >> with no arguments returns all param names
+#pod * calling C<< $obj->param($name) >> returns the value for that name
+#pod * calling C<< $obj->param($name, $value) >> sets the value for the name
+#pod
+#pod The Param store does not check the types of values, but for interoperation with
+#pod other stores, sticking to simple scalars is a good idea.
+#pod
+#pod = path_packer
+#pod
+#pod This is an object providing the L<Data::Hive::PathPacker> interface.  It will
+#pod convert a string to a path (arrayref) or the reverse.  It defaults to a
+#pod L<Data::Hive::PathPacker::Strict>.
+#pod
+#pod = exists
+#pod
+#pod This is a coderef used to check whether a given parameter name exists.  It will
+#pod be called as a method on the Data::Hive::Store::Param object with the path name
+#pod as its argument.
+#pod
+#pod The default behavior gets a list of all parameters and checks whether the given
+#pod name appears in it.
+#pod
+#pod = delete
+#pod
+#pod This is a coderef used to delete the value for a path from the hive.  It will
+#pod be called as a method on the Data::Hive::Store::Param object with the path name
+#pod as its argument.
+#pod
+#pod The default behavior is to call the C<delete> method on the object providing
+#pod the C<param> method.
+#pod
+#pod =end :list
+#pod
+#pod =cut
 
 sub path_packer { $_[0]{path_packer} }
 
@@ -114,7 +178,7 @@ Data::Hive::Store::Param - CGI::param-like store for Data::Hive
 
 =head1 VERSION
 
-version 1.011
+version 1.012
 
 =head1 DESCRIPTION
 

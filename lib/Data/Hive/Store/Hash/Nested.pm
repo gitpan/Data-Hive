@@ -1,12 +1,59 @@
 use strict;
 use warnings;
 package Data::Hive::Store::Hash::Nested;
-{
-  $Data::Hive::Store::Hash::Nested::VERSION = '1.011';
-}
-use base 'Data::Hive::Store';
 # ABSTRACT: store a hive in nested hashrefs
+$Data::Hive::Store::Hash::Nested::VERSION = '1.012';
+use parent 'Data::Hive::Store';
 
+#pod =head1 DESCRIPTION
+#pod
+#pod This is a simple store, primarily for testing, that will store hives in nested
+#pod hashrefs.  All hives are represented as hashrefs, and their values are stored
+#pod in the entry for the empty string.
+#pod
+#pod So, we could do this:
+#pod
+#pod   my $href = {};
+#pod
+#pod   my $hive = Data::Hive->NEW({
+#pod     store_class => 'Hash',
+#pod     store_args  => [ $href ],
+#pod   });
+#pod
+#pod   $hive->foo->SET(1);
+#pod   $hive->foo->bar->baz->SET(2);
+#pod
+#pod We would end up with C<$href> containing:
+#pod
+#pod   {
+#pod     foo => {
+#pod       ''  => 1,
+#pod       bar => {
+#pod         baz => {
+#pod           '' => 2,
+#pod         },
+#pod       },
+#pod     },
+#pod   }
+#pod
+#pod Using empty keys results in a bigger, uglier dump, but allows a given hive to
+#pod contain both a value and subhives.  B<Please note> that this is different
+#pod behavior compared with earlier releases, in which empty keys were not used and
+#pod it was not legal to have a value and a hive at a given path.  It is possible,
+#pod although fairly unlikely, that this format will change again.  The Hash store
+#pod should generally be used for testing things that use a hive, as opposed for
+#pod building hashes that will be used for anything else.
+#pod
+#pod =method new
+#pod
+#pod   my $store = Data::Hive::Store::Hash->new(\%hash);
+#pod
+#pod The only argument expected for C<new> is a hashref, which is the hashref in
+#pod which hive entries are stored.
+#pod
+#pod If no hashref is provided, a new, empty hashref will be used.
+#pod
+#pod =cut
 
 sub new {
   my ($class, $href) = @_;
@@ -15,6 +62,12 @@ sub new {
   return bless { store => $href } => $class;
 }
 
+#pod =method hash_store
+#pod
+#pod This method returns the hashref in which things are being used.  You should not
+#pod alter its contents!
+#pod
+#pod =cut
 
 sub hash_store {
   $_[0]->{store}
@@ -92,6 +145,17 @@ sub set {
   );
 }
 
+#pod =method name
+#pod
+#pod The name returned by the Hash store is a string, potentially suitable for
+#pod eval-ing, describing a hash dereference of a variable called C<< $STORE >>.
+#pod
+#pod   "$STORE->{foo}->{bar}"
+#pod
+#pod This is probably not very useful.  It might be replaced with something else in
+#pod the future.
+#pod
+#pod =cut
 
 sub name {
   my ($self, $path) = @_;
@@ -183,7 +247,7 @@ Data::Hive::Store::Hash::Nested - store a hive in nested hashrefs
 
 =head1 VERSION
 
-version 1.011
+version 1.012
 
 =head1 DESCRIPTION
 

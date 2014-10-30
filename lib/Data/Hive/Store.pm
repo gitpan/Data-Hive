@@ -1,13 +1,60 @@
 use strict;
 use warnings;
 package Data::Hive::Store;
-{
-  $Data::Hive::Store::VERSION = '1.011';
-}
 # ABSTRACT: a backend storage driver for Data::Hive
-
+$Data::Hive::Store::VERSION = '1.012';
 use Carp ();
 
+#pod =head1 DESCRIPTION
+#pod
+#pod Data::Hive::Store is a generic interface to a backend store
+#pod for Data::Hive.
+#pod
+#pod =head1 METHODS
+#pod
+#pod All methods are passed at least a 'path' (arrayref of namespace pieces).  Store
+#pod classes exist to operate on the entities found at named paths.
+#pod
+#pod =head2 get
+#pod
+#pod   print $store->get(\@path, \%opt);
+#pod
+#pod Return the resource represented by the given path.
+#pod
+#pod =head2 set
+#pod
+#pod   $store->set(\@path, $value, \%opt);
+#pod
+#pod Analogous to C<< get >>.
+#pod
+#pod =head2 name
+#pod
+#pod   print $store->name(\@path, \%opt);
+#pod
+#pod Return a store-specific name for the given path.  This is primarily useful for
+#pod stores that may be accessed independently of the hive.
+#pod
+#pod =head2 exists
+#pod
+#pod   if ($store->exists(\@path, \%opt)) { ... }
+#pod
+#pod Returns true if the given path exists in the store.
+#pod
+#pod =head2 delete
+#pod
+#pod   $store->delete(\@path, \%opt);
+#pod
+#pod Delete the given path from the store.  Return the previous value, if any.
+#pod
+#pod =head2 keys
+#pod
+#pod   my @keys = $store->keys(\@path, \%opt);
+#pod
+#pod This returns a list of next-level path elements that lead toward existing
+#pod values.  For more information on the expected behavior, see the L<KEYS
+#pod method|Data:Hive/keys> in Data::Hive.
+#pod
+#pod =cut
 
 BEGIN {
   for my $meth (qw(get set name exists delete keys)) {
@@ -54,7 +101,7 @@ Data::Hive::Store - a backend storage driver for Data::Hive
 
 =head1 VERSION
 
-version 1.011
+version 1.012
 
 =head1 DESCRIPTION
 

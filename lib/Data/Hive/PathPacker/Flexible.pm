@@ -1,12 +1,47 @@
 use strict;
 use warnings;
 package Data::Hive::PathPacker::Flexible;
-{
-  $Data::Hive::PathPacker::Flexible::VERSION = '1.011';
-}
-use base 'Data::Hive::PathPacker';
 # ABSTRACT: a path packer that can be customized with callbacks
+$Data::Hive::PathPacker::Flexible::VERSION = '1.012';
+use parent 'Data::Hive::PathPacker';
 
+#pod =head1 DESCRIPTION
+#pod
+#pod This class provides the Data::Hive::PathPacker interface, and the way in which
+#pod paths are packed and unpacked can be defined by callbacks set during
+#pod initialization.
+#pod
+#pod =method new
+#pod
+#pod   my $path_packer = Data::Hive::PathPacker::Flexible->new( \%arg );
+#pod
+#pod The valid arguments are:
+#pod
+#pod =begin :list
+#pod
+#pod = escape and unescape
+#pod
+#pod These coderefs are used to escape and path parts so that they can be split and
+#pod joined without ambiguity.  The callbacks will be called like this:
+#pod
+#pod   my $result = do {
+#pod     local $_ = $path_part;
+#pod     $store->$callback( $path_part );
+#pod   }
+#pod
+#pod The default escape routine uses URI-like encoding on non-word characters.
+#pod
+#pod = join, split, and separator
+#pod
+#pod The C<join> coderef is used to join pre-escaped path parts.  C<split> is used
+#pod to split up a complete name before unescaping the parts.
+#pod
+#pod By default, they will use a simple perl join and split on the character given
+#pod in the C<separator> option.
+#pod
+#pod =end :list
+#pod
+#pod =cut
 
 sub new {
   my ($class, $arg) = @_;
@@ -66,7 +101,7 @@ Data::Hive::PathPacker::Flexible - a path packer that can be customized with cal
 
 =head1 VERSION
 
-version 1.011
+version 1.012
 
 =head1 DESCRIPTION
 

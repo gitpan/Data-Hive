@@ -1,16 +1,54 @@
 use strict;
 use warnings;
 package Data::Hive::Test;
-{
-  $Data::Hive::Test::VERSION = '1.011';
-}
 # ABSTRACT: a bundle of tests for Data::Hive stores
-
+$Data::Hive::Test::VERSION = '1.012';
 use Data::Hive;
 use Data::Hive::Store::Hash;
 
 use Test::More 0.96; # subtest without tests
 
+#pod =head1 SYNOPSIS
+#pod
+#pod   use Test::More;
+#pod
+#pod   use Data::Hive::Test;
+#pod   use Data::Hive::Store::MyNewStore;
+#pod
+#pod   Data::Hive::Test->test_new_hive({ store_class => 'MyNewStore' });
+#pod
+#pod   # rest of your tests for your store
+#pod
+#pod   done_testing;
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod Data::Hive::Test is a library of tests that should be passable for any
+#pod conformant L<Data::Hive::Store> implementation.  It provides a method for
+#pod running a suite of tests -- which may expand or change -- that check the
+#pod behavior of a hive store by building a hive around it and testing its behavior.
+#pod
+#pod =method test_new_hive
+#pod
+#pod   Data::Hive::Test->test_new_hive( $desc, \%args_to_NEW );
+#pod
+#pod This method expects an (optional) description followed by a hashref of
+#pod arguments to be passed to Data::Hive's C<L<NEW|Data::Hive/NEW>> method.  A new
+#pod hive will be constructed with those arguments and a single subtest will be run,
+#pod including subtests that should pass against any conformant Data::Hive::Store
+#pod implementation.
+#pod
+#pod If the tests pass, the method will return the hive.  If they fail, the method
+#pod will return false.
+#pod
+#pod =method test_existing_hive
+#pod
+#pod   Data::Hive::Test->test_existing_hive( $desc, $hive );
+#pod
+#pod This method behaves just like C<test_new_hive>, but expects a hive rather than
+#pod arguments to use to build one.
+#pod
+#pod =cut
 
 sub test_new_hive {
   my ($self, $desc, $arg) = @_;
@@ -176,6 +214,29 @@ sub test_existing_hive {
       );
     };
 
+    subtest 'DELETE' => sub {
+      $hive->to_delete->top->SET(10);
+      $hive->to_delete->top->middle->SET(20);
+      $hive->to_delete->top->middle->bottom->SET(20);
+
+      $hive->to_delete->top->middle->DELETE;
+
+      ok(
+        $hive->to_delete->top->EXISTS,
+        "delete middle, top is still there",
+      );
+
+      ok(
+        ! $hive->to_delete->top->middle->EXISTS,
+        "delete middle, so it is gone",
+      );
+
+      ok(
+        $hive->to_delete->top->middle->bottom->EXISTS,
+        "delete middle, bottom is still there",
+      );
+    };
+
     subtest 'DELETE_ALL' => sub {
       $hive->doomed->alpha->branch->value->SET(1);
       $hive->doomed->bravo->branch->value->SET(1);
@@ -230,7 +291,7 @@ Data::Hive::Test - a bundle of tests for Data::Hive stores
 
 =head1 VERSION
 
-version 1.011
+version 1.012
 
 =head1 SYNOPSIS
 
